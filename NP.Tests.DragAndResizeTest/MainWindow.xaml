@@ -1,0 +1,43 @@
+﻿<Window x:Class="NP.Tests.DragAndResizeTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:visuals="http://np.com/visuals"
+        Title="MainWindow"
+        Height="250"
+        Width="400">
+    <Grid x:Name="DragContainer"
+          Background="Pink">
+        <Grid x:Name="GlyphWithResizing"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+              Background="Gray"
+              visuals:DragBehavior.DragContainerElement="{Binding ElementName=DragContainer}"
+              visuals:DragBehavior.DraggedElement="{Binding RelativeSource={RelativeSource Mode=Self}}"
+              visuals:SizeSettingBehavior.InitialSize="50,50"
+              visuals:ShiftBehavior.Position="{Binding Path=(visuals:DragBehavior.Shift), 
+                                                       RelativeSource={RelativeSource Mode=Self}}">
+            <visuals:SizeSettingBehavior.RealSize>
+                <MultiBinding Converter="{x:Static visuals:AddPointMultiConverter.Instance}">
+                    <Binding Path="(visuals:DragBehavior.TotalShiftWithRespectToContainer)"
+                             ElementName="ResizingThumb" />
+                    <Binding Path="(visuals:ActualSizeBehavior.ActualSize)"
+                             ElementName="ResizingThumb" />
+                </MultiBinding>
+            </visuals:SizeSettingBehavior.RealSize>
+            <Grid x:Name="MouseDownEventConsumingGrid" 
+                  visuals:EventConsumingBehavior.EventToConsume="{x:Static FrameworkElement.MouseDownEvent}">
+                <Rectangle x:Name="ResizingThumb"
+                           HorizontalAlignment="Right"
+                           VerticalAlignment="Bottom"
+                           Width="10"
+                           Height="10"
+                           Fill="Red"
+                           Cursor="SizeNWSE"
+                           visuals:DragBehavior.StartBoundaryPoint="20,20"
+                           visuals:DragBehavior.EndBoundaryPoint="100,100"
+                           visuals:DragBehavior.DragContainerElement="{Binding ElementName=GlyphWithResizing}"
+                           visuals:DragBehavior.DraggedElement="{Binding RelativeSource={RelativeSource Mode=Self}}" />
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

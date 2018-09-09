@@ -1,0 +1,33 @@
+﻿<Window x:Class="NP.Tests.SimpleDragTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:visuals="http://np.com/visuals"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow"
+        Height="450"
+        Width="800">
+    <Grid x:Name="DragContainer"
+          Background="Pink"
+          visuals:ActualSizeBehavior.IsSet="True">
+        <Rectangle Width="20"
+                   Height="20"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top" 
+                   Fill="Blue"
+                   visuals:DragBehavior.DragContainerElement="{Binding RelativeSource={RelativeSource AncestorType=Panel}}"
+                   visuals:DragBehavior.DraggedElement="{Binding RelativeSource={RelativeSource Mode=Self}}"
+                   visuals:ShiftBehavior.Position="{Binding Path=(visuals:DragBehavior.Shift), 
+                                                            RelativeSource={RelativeSource Mode=Self}}"/>
+
+        <Ellipse x:Name="TheCircle"
+                 Width="20"
+                 Height="20"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center"
+                 Fill="Green"
+                 visuals:DragBehavior.DragContainerElement="{Binding RelativeSource={RelativeSource AncestorType=Panel}}"
+                 visuals:DragBehavior.DraggedElement="{Binding RelativeSource={RelativeSource Mode=Self}}"
+                 visuals:ShiftBehavior.Position="{Binding Path=(visuals:DragBehavior.Shift), 
+                                                          RelativeSource={RelativeSource Mode=Self}}">
+        </Ellipse>
+    </Grid>
+</Window>

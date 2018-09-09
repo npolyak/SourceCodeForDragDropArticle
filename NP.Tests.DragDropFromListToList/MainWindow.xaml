@@ -1,0 +1,124 @@
+﻿<Window x:Class="NP.Tests.DragDropFromListToList.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:visuals="http://np.com/visuals"
+        xmlns:local="clr-namespace:NP.Tests.DragDropFromListToList"
+        Title="MainWindow"
+        Height="250"
+        Width="400">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/NP.Visuals;Component/Themes/ControlStylesAndTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Displays a Number -->
+            <DataTemplate x:Key="NumberItemDataTemplate">
+                <visuals:LabelContainer Background="LightGreen"
+                                        TheLabel="{Binding Number}" />
+            </DataTemplate>
+
+            <!-- Displays a Number String -->
+            <DataTemplate x:Key="NumberNameItemDataTemplate">
+                <visuals:LabelContainer Background="LightGreen"
+                                        TheLabel="{Binding NumStr}" />
+            </DataTemplate>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid x:Name="TopLevelPanel">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <!--Drag Cue-->
+        <Popup x:Name="TheDragCue"
+               AllowsTransparency="True"
+               Placement="RelativePoint"
+               PlacementTarget="{Binding ElementName=TopLevelPanel}"
+               IsOpen="{Binding Path=(visuals:DragBehavior.IsDragOn), Mode=OneWay}"
+               HorizontalOffset="{Binding Path=(visuals:DragBehavior.TotalShiftWithRespectToContainer).X}"
+               VerticalOffset="{Binding Path=(visuals:DragBehavior.TotalShiftWithRespectToContainer).Y}"
+               DataContext="{Binding Path=(visuals:DragBehavior.CurrentlyDraggedElement),
+                                     ElementName=TopLevelPanel}">
+            <Popup.Resources>
+                <visuals:BinaryToDoubleConverter x:Key="DragCueOpacityConverter"
+                                                 TrueValue="1"
+                                                 FalseValue="0.4" />
+            </Popup.Resources>
+            <visuals:LabelContainer x:Name="TheCueLabelContainer"
+                                    Background="LightGreen"
+                                    TheLabel="{Binding Path=DataContext.Number}"
+                                    Width="{Binding Path=ActualWidth}"
+                                    Height="{Binding Path=ActualHeight}"
+                                    Opacity="{Binding Path=(visuals:DropBehavior.IsDragAbove), 
+                                                      Converter={StaticResource DragCueOpacityConverter},
+                                                      ElementName=DropTargetList}" />
+        </Popup>
+
+        <!--Number Items (Drag Source)-->
+        <ItemsControl x:Name="DragSourceList"
+                      ItemsSource="{Binding Path=SourceList}"
+                      HorizontalAlignment="Stretch"
+                      ItemTemplate="{StaticResource NumberItemDataTemplate}">
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="FrameworkElement">
+                    <Setter Property="visuals:DragBehavior.DragContainerElement"
+                            Value="{Binding ElementName=TopLevelPanel}" />
+                    <Setter Property="visuals:DragBehavior.DraggedElement"
+                            Value="{Binding RelativeSource={RelativeSource Mode=Self}}" />
+                    <Setter Property="visuals:DragBehavior.BounceBackAtDragEnd"
+                            Value="True" />
+                    <Setter Property="Margin"
+                            Value="10,2" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+        </ItemsControl>
+
+        <!--Vertical Separator-->
+        <Grid x:Name="Separator"
+              VerticalAlignment="Stretch"
+              Grid.Column="1"
+              Width="20"
+              Background="LightBlue" />
+
+        <!--Drop Target-->
+        <Grid Grid.Column="2">
+            <Rectangle x:Name="DropCue"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"
+                       Height="2"
+                       Margin="0,-1"
+                       Fill="Red"
+                       Visibility="{Binding Path=(visuals:DropBehavior.CanDrop), 
+                                            Converter={x:Static visuals:BoolToVisConverter.TheInstance},
+                                            ElementName=DropTargetList}">
+                <Rectangle.RenderTransform>
+                    <TranslateTransform Y="{Binding Path=(visuals:DropBehavior.DropPosition).Y, 
+                                                       ElementName=DropTargetList}" />
+                </Rectangle.RenderTransform>
+            </Rectangle>
+            <ItemsControl x:Name="DropTargetList"
+                          HorizontalAlignment="Stretch"
+                          ItemsSource="{Binding Path=TargetList}"
+                          visuals:DropBehavior.ContainerElement="{Binding RelativeSource={RelativeSource Mode=Self}}"
+                          visuals:DropBehavior.DraggedElement="{Binding Path=(visuals:DragBehavior.CurrentlyDraggedElement), 
+                                                                        ElementName=TopLevelPanel}"
+                          visuals:DropBehavior.TheDropOperation="{x:Static local:DropIntoItemsPanelOperation.Instance}"
+                          visuals:DropBehavior.TheDropPositionChooser="{x:Static local:VerticalItemsPanelPositionChooser.Instance}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Margin="0,2" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <visuals:LabelContainer Background="LightGreen"
+                                                TheLabel="{Binding NumStr}"
+                                                Margin="0,2" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</Window>
